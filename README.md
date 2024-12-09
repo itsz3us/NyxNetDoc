@@ -1,5 +1,7 @@
 # NYXNET 
 
+
+
 This system is still work in progress, it leverages a peer-to-peer (P2P) network where nodes are identified using Nym client addresses, or Surbs instead of traditional IP addresses, ensuring privacy-focused connections. Joining the network is straightforward—anyone can participate by simply running a local Nym client. 
 
 ## Peer-to-Peer Protocol Messages
@@ -45,3 +47,6 @@ In addition to the core message types (`version, verack, ping/pong, addr/getaddr
     
 ```
 
+This is an extension of a peer-to-peer messaging chat. We have two individual nodes with publicly known Nym client addresses and one anonymous node. The anonymous node is connected to one of the individual nodes, but the individual node does not know the Nym client address of the anonymous node. The anonymous node builds and relays the message, and the individual node forwards it to its other connected nodes.
+
+[s2.webm](https://github.com/user-attachments/assets/a18a35af-26ea-4945-931a-04bd1bb5f7f2)
