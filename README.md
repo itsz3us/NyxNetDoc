@@ -1,52 +1,27 @@
-# NYXNET 
+People often get really interested in P2P decentralized distributed systems, but they tend to overlook an important detail. Just because a system is decentralized doesn’t mean the participants are anonymous or that their actions can’t be traced. In fact, activities on decentralized systems *can* still be traced, especially when privacy measures aren’t used. For example, the IP addresses of peers in a P2P network can be tracked across the network. Even using solutions like TOR doesn’t fully protect against this. Activities can still be traced by using pattern recognition and advanced analysis methods, which TOR and similar tools can’t always block.
 
+We need to create a P2P network that eliminates the use of IP addresses altogether and can withstand advanced tracking techniques. The first thing to do is create a system where users can interact without revealing their IP addresses. Nym Mixnet offers a potential solution to this problem.
 
+By using Nym Mixnet, we can set up a P2P network that protects privacy and security for all users, going beyond what current solutions offer. The first step involves creating a P2P network of nodes where anyone running a local Nym client can participate. Unlike traditional P2P networks that expose node IP addresses, this system keeps things private by having nodes use Nym client addresses instead. This way, no node’s IP address is exposed.
 
-This system is still work in progress, it leverages a peer-to-peer (P2P) network where nodes are identified using Nym client addresses, or Surbs instead of traditional IP addresses, ensuring privacy-focused connections. Joining the network is straightforward—anyone can participate by simply running a local Nym client. 
+The basic message structure between P2P nodes looks like this:
 
-## Peer-to-Peer Protocol Messages
+- **Version**: Sent when a node connects to another node, announcing its version. If the node is not in maximum anonymity mode, it also shares its Nym client address. Otherwise, it uses a Surb (Single Use Reply Block) for privacy.
+- **Verack**: Sent as a response to the version message, confirming that the node is ready to continue the connection.
+- **Ping/Pong**: Used to check if the connection is active. A ping is sent by one node, and the other node responds with a pong.
+- **Addr/Getaddr**: Helps with peer discovery and sharing addresses within the network.
+   - **Addr**: A node sends a getaddr message to request a list of peer addresses from another node.
+   - **GetAddr**: The other node replies with an addr message containing known peer addresses (Nym client addresses), helping the requesting node expand its peer list.
 
-Establishing and maintaining connections between nodes in a P2P network starts with an efficient and structured process. Nodes initiate communication by broadcasting their nym client addresses through a version message, which acts as the initial handshake. To ensure maximun anonymity, Single Use Reply Blocks (SURBs) are employed, allowing a node to introduce itself without revealing its nym client address to other nodes in the network. 
+All messages in this system are passed through the Nym Mixnet, making them resistant to pattern recognition and advanced tracking techniques.
 
+Here’s an example of how this works:
 
-### `version`
-- **Purpose:** Sent by a node when it first connects to another node.
-- **Function:** Initiates the connection by announcing the node's version and, if not in maximum anonymity mode, its Nym client address.
-### `verack`
-- **Purpose:** Sent in response to a `version` message.
-- **Function:** Acknowledges the `version` message and confirms the node is ready to proceed with the connection.
+1. **AliceNode** sends a version message to **BobNode**. 
+   - Start Mixing → Mixnode → Mixnode → Mixnode → Mixnode → Mixnode → End Mixing → BobNode.
+2. **BobNode** replies with a verack message to **AliceNode**.
+   - Start Mixing → Mixnode → Mixnode → Mixnode → Mixnode → Mixnode → End Mixing → AliceNode.
 
-### `ping/pong`
-- **Purpose:** Used to check if the connection is still active.
-- **Function:** A node sends a `ping` message, and the other node replies with a `pong` to confirm the connection is alive.
+This process happens with every protocol message exchanged between nodes, ensuring that each stage of the communication remains anonymous and private.
 
-
-### `addr/getaddr`
-- **Purpose:** Used for discovering and sharing peer addresses in the network.
-- **Function:**
-  - **`getaddr`:** A node sends a `getaddr` message to request a list of peer addresses from another node.
-  - **`addr`:** The other node responds with an `addr` message containing a list of known peers (addresses) to help the requesting node expand its peer list.
- 
-
-
-In addition to the core message types (`version, verack, ping/pong, addr/getaddr`), this system is designed to support custom objects seamlessly. Any object that implements the serialize and deserialize methods can be transmitted between nodes. This flexibility allows developers to extend the protocol for a variety of use cases.. 
-
-``` python
-    # Supported Objects:
-    # Any object can be transmitted as long as:
-    #  1. It implements a `serialize` method to convert itself into bytes.
-    #  2. It implements a `deserialize` method to reconstruct itself from bytes.
-
-    #Example:
-        class CustomObject(serialize.Serializable):
-            def serialize(self, nType=0, nVersion=0):
-                pass
-
-            def deserialize(self, f, nType=0, nVersion=0):
-                pass
-    
-```
-
-This is an extension of a peer-to-peer messaging chat. We have two individual nodes with publicly known Nym client addresses and one anonymous node. The anonymous node is connected to one of the individual nodes, but the individual node does not know the Nym client address of the anonymous node. The anonymous node builds and relays the message, and the individual node forwards it to its other connected nodes.
-
-[s2.webm](https://github.com/user-attachments/assets/a18a35af-26ea-4945-931a-04bd1bb5f7f2)
+In addition to the core message types (version, verack, ping/pong, addr/getaddr), the systemcan be designed to support custom objects seamlessly. Any object that implements the serialize and deserialize methods can be transmitted between nodes. This flexibility allows developers to extend the protocol for a variety of use cases..
